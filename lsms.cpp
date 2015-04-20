@@ -35,6 +35,76 @@ lsms * lsms_create(int num_particles, int num_springs, int num_particles_hold, i
 	return l;
 }
 
+lsms * lsms_create_from_file(char filename[])
+{
+    FILE * fp;
+    int i = 0;
+    int num_particles = 0;
+    int num_springs = 0;
+    int num_particles_hold = 0;
+    int num_springs_hold = 0;
+    double pos_x = 0;
+    double pos_y = 0;
+    double pos_z = 0;
+    double mass = 0;
+    double charge = 0;
+    int type = 0;
+    double k = 0;
+    double k_d = 0;
+    double x_0 = 0;
+    int pos_a = 0;
+    int pos_b = 0;
+
+    fp = fopen(filename, "r");
+    fscanf(fp, "%i", &num_particles);
+    fscanf(fp, "%i", &num_springs);
+    fscanf(fp, "%i", &num_particles_hold);
+    fscanf(fp, "%i", &num_springs_hold);
+
+    lsms * l = lsms_create(num_particles, num_springs, num_particles_hold, num_springs_hold);
+
+    for(i = 0; i < num_particles; i++)
+    {
+        fscanf(fp, "%lf", &pos_x);
+        fscanf(fp, "%lf", &pos_y);
+        fscanf(fp, "%lf", &pos_z);
+        fscanf(fp, "%lf", &mass);
+        fscanf(fp, "%lf", &charge);
+        lsms_set_particle(l, i, pos_x, pos_y, pos_z, mass, charge);
+    }
+    for(i = 0; i < num_springs; i++)
+    {
+        fscanf(fp, "%i", &type);
+        fscanf(fp, "%lf", &k);
+        fscanf(fp, "%lf", &k_d);
+        fscanf(fp, "%lf", &x_0);
+        fscanf(fp, "%i", &pos_a);
+        fscanf(fp, "%i", &pos_b);
+        lsms_set_spring(l, i, type, k, k_d, x_0, pos_a, pos_b);
+    }
+    for(i = 0; i < num_particles_hold; i++)
+    {
+        fscanf(fp, "%lf", &pos_x);
+        fscanf(fp, "%lf", &pos_y);
+        fscanf(fp, "%lf", &pos_z);
+        lsms_set_particle_hold(l, i, pos_x, pos_y, pos_z);
+
+    }
+    for(i = 0; i < num_springs_hold; i++)
+    {
+        fscanf(fp, "%i", &type);
+        fscanf(fp, "%lf", &k);
+        fscanf(fp, "%lf", &k_d);
+        fscanf(fp, "%lf", &x_0);
+        fscanf(fp, "%i", &pos_a);
+        fscanf(fp, "%i", &pos_b);
+        lsms_set_spring_hold(l, i, k, pos_a, pos_b);
+    }
+    fclose(fp);
+    return l;
+}
+
+
 void lsms_set_particle(lsms * l, int pos, double x, double y, double z, double mass, double charge)
 {
 	particle_init(l->p[pos], x, y, z, mass, charge);

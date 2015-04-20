@@ -18,6 +18,7 @@ typedef struct {
 } lsms;
 
 lsms * lsms_create(int num_particles, int num_springs, int num_particles_hold, int num_springs_hold);
+lsms * lsms_create_from_file(char filename[]);
 void lsms_set_particle(lsms * l, int pos, double x, double y, double z, double mass, double charge);
 void lsms_set_particle_hold(lsms * l, int pos, double x, double y, double z);
 void lsms_set_spring(lsms * l, int pos, int type, double k, double k_d, double x_0, int pos_a, int pos_b);

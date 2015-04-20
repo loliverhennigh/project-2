@@ -1,5 +1,6 @@
 
 #include "lsms.h"
+#include "draw_lsms.h"
 
 // Include standard headers
 #include <stdio.h>
@@ -23,17 +24,23 @@ using namespace glm;
 
 int main( void )
 {
-	lsms * l;
-	lsms * l_b = lsms_init_rope(0.0, -1.0, 0.0, 0.0, 1.0, 0.0, 0.1, 10.0, 10.0, 10);
-	lsms * l_a = lsms_init_rope(0.1, -1.0, 0.0, 0.1, 1.0, 0.0, 0.1, 10.0, 10.0, 10);
-	lsms * l_c = lsms_init_rope(0.03333, -1.0, 0.0, 0.033, 1.0, 0.0, 0.1, 10.0, 10.0, 10);
-	lsms * l_d = lsms_init_rope(0.0666, -1.0, 0.0, 0.06666, 1.0, 0.0, 0.1, 10.0, 10.0, 10);
-	l = lsms_add_tensor(l_b, l_a, 100.0, .0225);
-	l = lsms_add_tensor(l, l_c, 100.0, .0225);
-	l = lsms_add_tensor(l, l_d, 100.0, .0225);
-	lsms_first_step(l, 0.01);
-	lsms_update(l, .001, 1000000);
+        int i = 0;
+        lsms * l = lsms_create_from_file("test_spring_1.txt");
+	draw_lsms * dl = draw_lsms_create_from_file("test_spring_draw_1.txt");
+
+        lsms_first_step(l, .001);
 	printf("done \n");
+	printf("done %f \n", l->p[0]->x_a);
+	printf("done %f \n", l->p[0]->y_a);
+	printf("done %f \n", l->p[0]->z_a);
+        printf("done %f \n", l->p[1]->x_a);
+	printf("done %f \n", l->p[1]->y_a);
+	printf("done %f \n", l->p[1]->z_a);
+        printf("done %f \n", l->p[2]->x_a);
+	printf("done %f \n", l->p[2]->y_a);
+	printf("done %f \n", l->p[2]->z_a);
+
+
 
         
 
@@ -78,7 +85,7 @@ int main( void )
 	glDepthFunc(GL_LESS); 
 
 	// Cull triangles which normal is not towards the camera
-//	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -91,103 +98,80 @@ int main( void )
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
 
 
-	// Our vertices. Tree consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
 	// A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
-	static const GLfloat g_vertex_buffer_data[] = { 
-		-1.0f,-1.0f,-1.0f,
+	static GLfloat * g_vertex_buffer_data = new GLfloat[3 * dl->num_draw_vertices];
+	static GLfloat * g_color_buffer_data = new GLfloat[3 * dl->num_draw_vertices];
+
+                for(i = 0; i < dl->num_draw_vertices; i++)
+                {
+                 //   glm::vec3 pos = 
+	            g_vertex_buffer_data[3*i + 0] = (GLfloat)particle_get_x_a(l->p[dl->draw_vertices_list[i]]);
+	            g_vertex_buffer_data[3*i + 1] = (GLfloat)particle_get_y_a(l->p[dl->draw_vertices_list[i]]);
+	            g_vertex_buffer_data[3*i + 2] = (GLfloat)particle_get_z_a(l->p[dl->draw_vertices_list[i]]);
+	            g_color_buffer_data[3*i + 0] = 1;
+	            g_color_buffer_data[3*i + 1] = .2;
+	            g_color_buffer_data[3*i + 2] = .2;
+                }
+
+	static GLfloat test_g_vertex_buffer_data[] = { 
+		-30.0f,
+                -10.0f,
+                -10.0f,
 		-1.0f,-1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f,
-		 1.0f, 1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f,-1.0f,
-		 1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f,-1.0f,
-		 1.0f,-1.0f,-1.0f,
-		 1.0f, 1.0f,-1.0f,
-		 1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f,-1.0f,
-		 1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		-1.0f,-1.0f, 1.0f,
-		 1.0f,-1.0f, 1.0f,
-		 1.0f, 1.0f, 1.0f,
-		 1.0f,-1.0f,-1.0f,
-		 1.0f, 1.0f,-1.0f,
-		 1.0f,-1.0f,-1.0f,
-		 1.0f, 1.0f, 1.0f,
-		 1.0f,-1.0f, 1.0f,
-		 1.0f, 1.0f, 1.0f,
-		 1.0f, 1.0f,-1.0f,
-		-1.0f, 1.0f,-1.0f,
-		 1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		 1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f,
-		 1.0f,-1.0f, 1.0f
+		-30.0f, 10.0f, 1.0f,
+	};
+        printf("sdlafkj %f \n", g_vertex_buffer_data[3]);
+
+	// Two UV coordinatesfor each vertex. They were created withe Blender.
+	static GLfloat test_g_color_buffer_data[] = { 
+		0.1f, 0.4f, .1f,
+		0.1f, 0.3f, .1f,
+		0.1f, 0.335903f, .1f, 
 	};
 
-	// One color for each vertex. They were generated randomly.
-	static const GLfloat g_color_buffer_data[] = { 
-		0.583f,  0.771f,  0.014f,
-		0.609f,  0.115f,  0.436f,
-		0.327f,  0.483f,  0.844f,
-		0.822f,  0.569f,  0.201f,
-		0.435f,  0.602f,  0.223f,
-		0.310f,  0.747f,  0.185f,
-		0.597f,  0.770f,  0.761f,
-		0.559f,  0.436f,  0.730f,
-		0.359f,  0.583f,  0.152f,
-		0.483f,  0.596f,  0.789f,
-		0.559f,  0.861f,  0.639f,
-		0.195f,  0.548f,  0.859f,
-		0.014f,  0.184f,  0.576f,
-		0.771f,  0.328f,  0.970f,
-		0.406f,  0.615f,  0.116f,
-		0.676f,  0.977f,  0.133f,
-		0.971f,  0.572f,  0.833f,
-		0.140f,  0.616f,  0.489f,
-		0.997f,  0.513f,  0.064f,
-		0.945f,  0.719f,  0.592f,
-		0.543f,  0.021f,  0.978f,
-		0.279f,  0.317f,  0.505f,
-		0.167f,  0.620f,  0.077f,
-		0.347f,  0.857f,  0.137f,
-		0.055f,  0.953f,  0.042f,
-		0.714f,  0.505f,  0.345f,
-		0.783f,  0.290f,  0.734f,
-		0.722f,  0.645f,  0.174f,
-		0.302f,  0.455f,  0.848f,
-		0.225f,  0.587f,  0.040f,
-		0.517f,  0.713f,  0.338f,
-		0.053f,  0.959f,  0.120f,
-		0.393f,  0.621f,  0.362f,
-		0.673f,  0.211f,  0.457f,
-		0.820f,  0.883f,  0.371f,
-		0.982f,  0.099f,  0.879f
-	};
+
+
+
+
+//	printf("done %f \n", g_color_buffer_data[1]);
+//	printf("done %f \n", g_color_buffer_data[2]);
+//	printf("done %f \n", g_color_buffer_data[3]);
+//	printf("done %f \n", g_color_buffer_data[4]);
+//	printf("done %f \n", g_vertex_buffer_data[5]);
+//	printf("done %f \n", g_vertex_buffer_data[6]);
+//	printf("done %f \n", g_vertex_buffer_data[7]);
+//	printf("done %f \n", g_vertex_buffer_data[8]);
+	printf("done %i \n", sizeof(test_g_vertex_buffer_data));
+	printf("done %i \n", sizeof(g_vertex_buffer_data));
+
+        int size = 3 * dl->num_draw_vertices * sizeof(GLfloat);
 
 
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STREAM_DRAW);
 
 	GLuint colorbuffer;
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STREAM_DRAW);
 
+        double lastTime = glfwGetTime();
 	do{
-
+                
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+
+		double currentTime = glfwGetTime();
+		double delta = currentTime - lastTime;
+		lastTime = currentTime;
+                int num_steps = (int)(delta*10000.0);
+                if (num_steps > 100)
+                    num_steps = 100;
+                
 		// Use our shader
 		glUseProgram(programID);
 
@@ -198,9 +182,30 @@ int main( void )
 		glm::mat4 ModelMatrix = glm::mat4(1.0);
 		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
+                lsms_update(l, .001, num_steps);
+
+                for(i = 0; i < dl->num_draw_vertices; i++)
+                {
+	            g_vertex_buffer_data[3*i + 0] = particle_get_x_a(l->p[dl->draw_vertices_list[i]]);
+	            g_vertex_buffer_data[3*i + 1] = particle_get_y_a(l->p[dl->draw_vertices_list[i]]);
+	            g_vertex_buffer_data[3*i + 2] = particle_get_z_a(l->p[dl->draw_vertices_list[i]]);
+	            g_color_buffer_data[3*i + 0] = 1;
+	            g_color_buffer_data[3*i + 1] = .2;
+	            g_color_buffer_data[3*i + 2] = .2;
+                }
+
+                glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+	        glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STREAM_DRAW);
+                glBufferSubData(GL_ARRAY_BUFFER, 0, size, g_vertex_buffer_data);
+                glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+	        glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STREAM_DRAW);
+                glBufferSubData(GL_ARRAY_BUFFER, 0, size, g_color_buffer_data);
+
 		// Send our transformation to the currently bound shader, 
 		// in the "MVP" uniform
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
+
 
 
 		// 1rst attribute buffer : vertices
@@ -228,7 +233,7 @@ int main( void )
 		);
 
 		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 12*3); // 12*3 indices starting at 0 -> 12 triangles
+		glDrawArrays(GL_POINTS, 0, 3); // 12*3 indices starting at 0 -> 12 triangles
 
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);

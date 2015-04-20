@@ -28,6 +28,7 @@ double particle_get_x_b(particle * p);
 double particle_get_y_b(particle * p);
 double particle_get_z_b(particle * p);
 double particle_get_mass(particle * p);
+double particle_get_charge(particle * p);
 void particle_set_x_a(particle * p, double x);
 void particle_set_x_b(particle * p, double x);
 void particle_set_y_a(particle * p, double y);
